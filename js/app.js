@@ -1,3 +1,19 @@
+/********************************************************
+
+Author: Tracey Martin
+Sources:
+https://www.w3schools.com/
+http://api.jquery.com/jQuery.ajax/
+https://developer.mozilla.org/en-US/
+Udacity videos 
+
+TODO:
+1- styling 
+2- unspaghetti the code
+3- update all conditionals to use the conditional operator
+4- tablet and phone rendering in the CSS
+
+**********************************************************/
 
 
     let memoryCards = [];
@@ -8,7 +24,6 @@
     let openCards = [];
     let stars = 3;
     let moveCount = document.querySelector('.moves');
-  
     let matchMessage = document.querySelector('.match-message');
     let matchModal = document.querySelector('.match-modal');
     let closeModal = document.querySelector('.close');
@@ -17,7 +32,7 @@
     let startGame;
 
 
-// Shuffle function from http://stackoverflow.com/a/2450976
+/*************Shuffle function from http://stackoverflow.com/a/2450976************/
 function shuffle(array) {
     var currentIndex = array.length, temporaryValue, randomIndex;
 
@@ -45,7 +60,8 @@ function shuffleDeck(cards) {
     shuffledMemoryCards = shuffle(cards);
 }
 
-// setup the cards and create the game board
+/******************setup the cards and create the game board***************/
+
 function createGameBoard() {
 
     shuffleDeck(memoryCards);
@@ -63,6 +79,8 @@ function createGameBoard() {
         this.append(iElement);
     });
 }
+
+/*****************checking for matches***********************/
 
 //cards match 
 function match() {
@@ -84,52 +102,94 @@ function noMatch(){
 }
 
 
-//update the move counter and the moves and stars on the game
+/*********increment move counter, display the moves and stars********/
+
 function updateMoves(){
 
-   let moveStars = document.querySelector('.stars');
+    let moveStars = document.querySelector('.stars');
     moveCounter += 1;
     moveCount.innerHTML = moveCounter.toString();
     
     switch (moveCounter){
         case 14:
             moveStars.removeChild(moveStars.firstChild);
-            stars = 2
-        case 31:
+            stars--;
+            break;
+        case 24:
             moveStars.removeChild(moveStars.firstChild);
-            stars = 1;
-            break;    
+            stars--;
+            break;
+         case 30:
+            moveStars.removeChild(moveStars.firstChild);
+            stars--;
+            break;       
         default:
             break;    
     }
 }
 
-//play again
+/**************************play again****************************/
+//from the board and play again button on the modal
 function resetGame() {
 
     location.reload();
 }
 
+/***************************set time*******************************/
+//https://stackoverflow.com/questions/3733227/javascript-seconds-to-minutes-and-seconds
+ function setTime(time){
+
+    //get the minutes
+    var minutes = Math.floor(time / 60);
+    //convert back to seconds to get the ss in  min:ss
+    time -= minutes * 60;
+
+    var seconds = parseInt(time % 60, 10);
+
+
+    
+    var newTime = (minutes < 10 ? '0' + minutes : minutes) + ':' + (seconds < 10 ? '0' + seconds : seconds);
+
+
+    return newTime;
+ }
+
+
 createDeck();
 createGameBoard();
 
 
-//play game
+/*************************play game**************************/
+
 $('.deck').on( 'click', 'li', function(event) {
         
-       if (time === 0){ 
+    if (time === 0){ 
        var gameTimer = setInterval(function(){
             time++;
-            document.getElementById("timer").innerHTML = time;
-            if (matchCounter === 8) clearInterval(gameTimer);  
+            var timeFormatted = setTime(time);
+            document.getElementById("timer").innerHTML = timeFormatted;
+
+            if (matchCounter === 8) {
+                clearInterval(gameTimer);
+                starMessage = stars + "stars!!!  ";
+                if (stars === 0){
+                    matchMessage.innerHTML = "No stars! " + moveCounter + " moves!  Time: " + timeFormatted;
+                } else {
+                    matchMessage.innerHTML = starMessage + moveCounter + " moves!  Time: " + timeFormatted;
+            }
+            matchModal.style.display = "block";
+            }    
             }, 1000);
         }
             
 
         let selectedCard = $( event.target );
-    
-        //show card and add to array if length less than 2 
-        if ( openCards.length < 2 && !selectedCard.hasClass("open"))  {
+        
+        if (selectedCard.hasClass("match")){
+            alert("Already matched");
+        } else if (selectedCard.hasClass("open")){
+                alert("Already selected");
+        } else if ( openCards.length < 2 )  {
             openCards.push(selectedCard.children());
             selectedCard.addClass("open show");
 
@@ -147,28 +207,15 @@ $('.deck').on( 'click', 'li', function(event) {
                 //update Moves
                 updateMoves();
             }
+        } else {
+            alert("Two cards at a time"); 
         }
-        else {
-            
-            alert("No double clicking!");
-        }
-
-        //check for game win
-        //TODO: make not ugly
-        if (matchCounter === 8) { 
-            starMessage = "You got " + stars + "!!! ";
-
-            if (stars === 0){
-                matchMessage.innerHTML = "No stars for you " + moveCounter + " moves! Time: " + time;
-            } else {
-                matchMessage.innerHTML = starMessage + moveCounter + " moves! Time: " + time;
-            }
-            matchModal.style.display = "block";
-        }
+        
 });
 
 //reset game
 playAgain.addEventListener('click', resetGame);
+
 
 //close the winning game message
 closeModal.addEventListener('click', function(){ 
