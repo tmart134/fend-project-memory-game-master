@@ -1,5 +1,5 @@
-/********************************************************
-
+/********************************************************/
+/* 
 Author: Tracey Martin
 Sources:
 https://www.w3schools.com/
@@ -11,9 +11,7 @@ TODO:
 1- styling 
 2- unspaghetti the code
 3- update all conditionals to use the conditional operator
-4- tablet and phone rendering in the CSS
-
-**********************************************************/
+*/
 
 
     let memoryCards = [];
@@ -30,6 +28,7 @@ TODO:
     let playAgain= document.querySelector('.restart');
     let time = 0;
     let startGame;
+  
 
 
 /*************Shuffle function from http://stackoverflow.com/a/2450976************/
@@ -106,25 +105,23 @@ function noMatch(){
 
 function updateMoves(){
 
-    let moveStars = document.querySelector('.stars');
+    let moveStars = document.querySelector('.stars li');
     moveCounter += 1;
     moveCount.innerHTML = moveCounter.toString();
     
     switch (moveCounter){
-        case 14:
-            moveStars.removeChild(moveStars.firstChild);
+        case 10:
+            moveStars.remove();
             stars--;
             break;
-        case 24:
-            moveStars.removeChild(moveStars.firstChild);
+        case 20:
+            moveStars.remove();
             stars--;
             break;
-         case 30:
-            moveStars.removeChild(moveStars.firstChild);
+        case 30:
+            moveStars.remove();
             stars--;
-            break;       
-        default:
-            break;    
+            break;            
     }
 }
 
@@ -183,17 +180,21 @@ $('.deck').on( 'click', 'li', function(event) {
         }
             
 
-        let selectedCard = $( event.target );
-        
-        if (selectedCard.hasClass("match")){
-            alert("Already matched");
-        } else if (selectedCard.hasClass("open")){
-                alert("Already selected");
-        } else if ( openCards.length < 2 )  {
-            openCards.push(selectedCard.children());
-            selectedCard.addClass("open show");
+        let selectedCard = $( this );
 
-            //check for match
+        
+        if ( openCards.length < 2 )  {
+
+            if (selectedCard.hasClass("match")){
+                alert("Already matched");
+            } else if (selectedCard.hasClass("open")){
+                alert("Already selected this one!");
+            } else {
+                openCards.push(selectedCard.children());
+                selectedCard.addClass("open show");
+            }
+
+             //check for match
             if ( openCards.length === 2){
                 if ( openCards[0][0].className  === openCards[1][0].className) {
                     
@@ -204,13 +205,15 @@ $('.deck').on( 'click', 'li', function(event) {
                     noMatch();
                  
                 } 
-                //update Moves
-                updateMoves();
+             //update Moves
+            updateMoves();   
             }
+            
+                
         } else {
-            alert("Two cards at a time"); 
+            alert("Two cards at a time");
+            updateMoves(); 
         }
-        
 });
 
 //reset game
